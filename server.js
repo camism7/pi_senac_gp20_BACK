@@ -43,7 +43,7 @@ const authenticate = (req, res, next) => {
 };
 
 // Criar um agendamento
-app.post("/agendar", authenticate, async (req, res) => {
+app.post("/agendamentos", authenticate, async (req, res) => {
   try {
     const { data, hora, medico } = req.body;
     const novoAgendamento = new Agendamento({
