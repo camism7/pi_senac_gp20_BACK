@@ -30,31 +30,32 @@ const AgendamentoSchema = new mongoose.Schema({
 
 const Agendamento = mongoose.model("Agendamento", AgendamentoSchema);
 
-// Middleware de autenticação
-const authenticate = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Acesso negado." });
+// // Middleware de autenticação
+// const authenticate = (req, res, next) => {
+//   const token = req.headers.authorization?.split(" ")[1];
+//   if (!token) return res.status(401).json({ message: "Acesso negado." });
 
-  jwt.verify(token, "secreto", (err, decoded) => {
-    if (err) return res.status(403).json({ message: "Token inválido." });
-    req.userId = decoded.userId;
-    next();
-  });
-};
+//   jwt.verify(token, "secreto", (err, decoded) => {
+//     if (err) return res.status(403).json({ message: "Token inválido." });
+//     req.userId = decoded.userId;
+//     next();
+//   });
+// };
 
 // Criar um agendamento
-app.post("/agendamentos", authenticate, async (req, res) => {
+app.post("/agendamentos", async (req, res) => {
   try {
     const { data, hora, medico } = req.body;
     const novoAgendamento = new Agendamento({
       userId: req.userId,
-      data,
-      hora,
-      medico,
+      data: data,
+      hora: hora,
+      medico: medico,
     });
     await novoAgendamento.save();
     res.status(201).json({ message: "Agendamento criado com sucesso!" });
   } catch (error) {
+    console.log(error);
     res
       .status(500)
       .json({ message: "Erro ao criar seu agendamento. Tente novamente" });
@@ -62,7 +63,7 @@ app.post("/agendamentos", authenticate, async (req, res) => {
 });
 
 // Obter agendamentos do usuário logado
-app.get("/meus-agendamentos", authenticate, async (req, res) => {
+app.get("/meus-agendamentos", async (req, res) => {
   try {
     const agendamentos = await Agendamento.find({ userId: req.userId });
     res.json(agendamentos);
